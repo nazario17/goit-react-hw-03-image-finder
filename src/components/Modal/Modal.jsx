@@ -3,27 +3,31 @@ import PropTypes from 'prop-types';
 import './Modal.module.css';
 
 class Modal extends Component {
-  static propTypes = {
-    onClose: PropTypes.func.isRequired,
-    onOverlayClick: PropTypes.func.isRequired,
-    onKeyDown: PropTypes.func.isRequired,
-    largeImageURL: PropTypes.string.isRequired,
-  };
-
   componentDidMount() {
-    window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('keydown', this.handleKeyDown);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('keydown', this.handleKeyDown);
   }
 
+  handleKeyDown = event => {
+    if (event.code === 'Escape') {
+      this.props.onClose();
+    }
+  };
 
+  handleOverlayClick = event => {
+    if (event.target === event.currentTarget) {
+      this.props.onClose();
+    }
+  };
 
   render() {
-    const { onOverlayClick, largeImageURL } = this.props;
+    const { largeImageURL } = this.props;
+
     return (
-      <div className="overlay" onClick={onOverlayClick}>
+      <div className="overlay" onClick={this.handleOverlayClick}>
         <div className="modal">
           <img src={largeImageURL} alt="" />
         </div>
@@ -31,5 +35,10 @@ class Modal extends Component {
     );
   }
 }
+
+Modal.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  largeImageURL: PropTypes.string.isRequired,
+};
 
 export default Modal;

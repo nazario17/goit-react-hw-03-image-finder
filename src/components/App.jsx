@@ -57,17 +57,17 @@ class App extends Component {
     this.setState({ showModal: false, largeImageURL: '' });
   };
 
-  handleModalOverlayClick = event => {
-    if (event.target === event.currentTarget) {
-      this.handleCloseModal();
-    }
-  };
+  // handleModalOverlayClick = event => {
+  //   if (event.target === event.currentTarget) {
+  //     this.handleCloseModal();
+  //   }
+  // };
 
-  handleKeyDown = event => {
-    if (event.code === 'Escape') {
-      this.handleCloseModal();
-    }
-  };
+  // handleKeyDown = event => {
+  //   if (event.code === 'Escape') {
+  //     this.handleCloseModal();
+  //   }
+  // };
 
   render() {
     const { images, isLoading, showModal, largeImageURL } = this.state;
@@ -85,8 +85,8 @@ class App extends Component {
           <Modal
             largeImageURL={largeImageURL}
             onClose={this.handleCloseModal}
-            onOverlayClick={this.handleModalOverlayClick}
-            onKeyDown={this.handleKeyDown}
+            // onOverlayClick={this.handleModalOverlayClick}
+            // onKeyDown={this.handleKeyDown}
           />
         )}
       </div>
