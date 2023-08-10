@@ -4,7 +4,7 @@ import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
 import Modal from './Modal/Modal';
 import Loader from './Loader/Loader';
-import { fetchImages } from 'services/api';
+// import { fetchImages } from 'services/api';
 
 class App extends Component {
   state = {
@@ -16,34 +16,37 @@ class App extends Component {
     largeImageURL: '',
   };
 
+  componentDidUpdate(prevProps, prevState) {
+    const APIKEY = '38573662-3e20df9f693fcf1720c6655b4';
+    const perpage = 12;
+    if (
+      prevState.query !== this.state.query ||
+      prevState.currentPage !== this.state.currentPage
+    ) {
+      this.setState({ isLoading: true });
+      fetch(
+        `https://pixabay.com/api/?q=${this.state.query}&page=${this.state.currentPage}&key=${APIKEY}&image_type=photo&orientation=horizontal&per_page=${perpage}`
+      )
+        .then(response => response.json())
+        .then(image => {
+          if (!image.total) {
+            return alert('Нічого не знайдено');
+          }
+          this.setState(prevState => ({
+            images: [...prevState.images, ...image.hits],
+          }));
+        })
+        .catch(error => error)
+        .finally(() => {
+          this.setState({ isLoading: false });
+        });
+    }
+  }
   handleSearchSubmit = query => {
-    this.setState(
-      { images: [], isLoading: true, query, currentPage: 1 },
-      () => {
-        this.fetchImages();
-      }
-    );
-  };
-
-  fetchImages = () => {
-    const { query, currentPage } = this.state;
-
-    fetchImages(query, currentPage)
-      .then(images => {
-        this.setState(prevState => ({
-          images: [...prevState.images, ...images],
-          isLoading: false,
-          currentPage: prevState.currentPage + 1,
-        }));
-      })
-      .catch(error => {
-        console.error('Error fetching images:', error);
-        this.setState({ isLoading: false });
-      });
-  };
-
-  handleLoadMore = () => {
-    this.fetchImages();
+    if (this.state.query === query || !query.length) {
+      return alert(`Ви вже увели ${query}`);
+    }
+    this.setState({ query: query.toLowerCase(), images: [], currentPage: 1 });
   };
 
   handleItemClick = largeImageURL => {
@@ -52,6 +55,18 @@ class App extends Component {
 
   handleCloseModal = () => {
     this.setState({ showModal: false, largeImageURL: '' });
+  };
+
+  handleModalOverlayClick = event => {
+    if (event.target === event.currentTarget) {
+      this.handleCloseModal();
+    }
+  };
+
+  handleKeyDown = event => {
+    if (event.code === 'Escape') {
+      this.handleCloseModal();
+    }
   };
 
   render() {
@@ -70,6 +85,8 @@ class App extends Component {
           <Modal
             largeImageURL={largeImageURL}
             onClose={this.handleCloseModal}
+            onOverlayClick={this.handleModalOverlayClick}
+            onKeyDown={this.handleKeyDown}
           />
         )}
       </div>
